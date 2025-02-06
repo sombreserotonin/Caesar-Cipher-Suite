@@ -2,17 +2,14 @@ def caeser_encrypt(user_input: str, shift_key: int, counter: int) -> str:
     alphabet_matrix = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"] # Map to compare to user input
     encrypted_matrix = [] # Final Array of calculated alphabet shifts
     for characters in user_input: # Split string user_input into chars
-        #print(characters, type(user_input), shift_key, type(shift_key))
         if characters in alphabet_matrix: # If the characters from user_input match the alphabet_matrix THEN do following
             alphabet_index = alphabet_matrix.index(characters)
-            #print("Should output each one", alphabet_index)
             alphabet_index = alphabet_index + shift_key - (26 * ((alphabet_index + shift_key) // 26)) 
             # Add shift_key (99) to alphabet_index to get the new shift value (e.g 2 = [C] + 99 = 101)
             # Divide (alphabet_index + shift_key) by 26 to find how many full cycles fit within 26 (e.g 101 // 26 = 3) - // rounding DOWN to closest whole number, we can't handle float
             # Now multiplication occurs where 26 * 3 = 78
             # Subtract the total value of alphabet_index + shift_key = 101 with 78 (101 - 78 = 23)
             # [23] is the true shift value alphabet_index and does not exceed [25] (would cause out of bounds error otherwise)
-            #print("Should be Updated Number ", alphabet_index)
             alphabet_cipher = alphabet_matrix[alphabet_index] # True shift value used to access the corresponding index of a character inside alphabet_matrix and passed into alphabet_cipher
             encrypted_matrix.append(alphabet_cipher) # Add each new indexed character to encrypted matrix array 
         else: # Otherwise everything else, wherever in the loop position as was entered by the user, is appended before joining
@@ -60,7 +57,6 @@ def user_option_menu(counter: int) -> None:
                     print(Errors) # Print the original Negative number error message as passed onto ValueError
                 else:
                     print(" [Error]: Input is not a Number\n") # NaN error message
-        #print(" Your Sentence/Word:", string_input, "\n Your Shift Key:", shiftkey_input)
         caeser_encrypt(user_string_input, shiftkey_input, counter) # Pass parameters into caesar_encrypt()
     elif user_option_input in ["2"]: # Decrypt Option, Same as above
         user_string_input = input("-[Decryption Menu]-\n Please Enter The Ciphertext You Would Like To Decrypt: " ).upper()
