@@ -1,83 +1,134 @@
-def caeser_encrypt(user_input: str, shift_key: int, counter: int) -> str:
-    alphabet_matrix = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"] # Map to compare to user input
-    encrypted_matrix = [] # Final Array of calculated alphabet shifts
-    for characters in user_input: # Split string user_input into chars
-        if characters in alphabet_matrix: # If the characters from user_input match the alphabet_matrix THEN do following
-            alphabet_index = alphabet_matrix.index(characters)
-            alphabet_index = alphabet_index + shift_key - (26 * ((alphabet_index + shift_key) // 26)) 
-            # Add shift_key (99) to alphabet_index to get the new shift value (e.g 2 = [C] + 99 = 101)
-            # Divide (alphabet_index + shift_key) by 26 to find how many full cycles fit within 26 (e.g 101 // 26 = 3) - // rounding DOWN to closest whole number, we can't handle float
-            # Now multiplication occurs where 26 * 3 = 78
-            # Subtract the total value of alphabet_index + shift_key = 101 with 78 (101 - 78 = 23)
-            # [23] is the true shift value alphabet_index and does not exceed [25] (would cause out of bounds error otherwise)
-            alphabet_cipher = alphabet_matrix[alphabet_index] # True shift value used to access the corresponding index of a character inside alphabet_matrix and passed into alphabet_cipher
-            encrypted_matrix.append(alphabet_cipher) # Add each new indexed character to encrypted matrix array 
-        else: # Otherwise everything else, wherever in the loop position as was entered by the user, is appended before joining
-            encrypted_matrix.append(characters)
+#!/usr/bin/env python3
+"""
+Caesar Cipher Suite - A simple and flexible command line-based Python implementation of the Caesar cipher.
+This program provides encryption and decryption capabilities for text using the Caesar cipher technique.
+"""
 
-    cipher_output = "".join(encrypted_matrix) # Join list of characters inside encrypted_matrix to form a string
+import sys
+from typing import List, Optional, Union
+
+# Constants
+ALPHABET_MATRIX = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"]
+WELCOME_MESSAGE = "Hello & Welcome to my Caesar Cipher Suite Personal Project!"
+MENU_PROMPT = "-[Suite Menu]-\n Please Enter [1] for Encryption: \n Please Enter [2] for Decryption:\n To Exit, Please Type either of the following: [stop, quit, exit, q] \n Your Choice: "
+ENCRYPTION_PROMPT = "-[Encryption Menu]-\n Please Enter A Sentence or Word You Would Like To Encrypt: "
+DECRYPTION_PROMPT = "-[Decryption Menu]-\n Please Enter The Ciphertext You Would Like To Decrypt: "
+SHIFT_KEY_PROMPT = " Please Enter A Number For Creating Your Unique Ciphertext: "
+ERROR_NOT_NUMBER = " [Error]: Input is not a Number\n"
+ERROR_NEGATIVE = " [Error]: Input can not be Negative\n"
+ERROR_INVALID_OPTION = "Please Enter A Valid Option!\n"
+EXIT_MESSAGE = "Exiting Caesar Cipher Suite"
+
+
+def caesar_encrypt(user_input: str, shift_key: int) -> str:
+    """
+    Encrypt the input text using the Caesar cipher algorithm.
+    
+    Args:
+        user_input: The text to encrypt
+        shift_key: The number of positions to shift each letter
+        
+    Returns:
+        The encrypted text
+    """
+    encrypted_matrix = []  # Final Array of calculated alphabet shifts
+    
+    for character in user_input:  # Split string user_input into chars
+        if character in ALPHABET_MATRIX:  # If the character from user_input matches the alphabet_matrix
+            alphabet_index = ALPHABET_MATRIX.index(character)
+            # Simplified algorithm using modulo
+            new_index = (alphabet_index + shift_key) % 26
+            alphabet_cipher = ALPHABET_MATRIX[new_index]
+            encrypted_matrix.append(alphabet_cipher)
+        else:  # Otherwise preserve the character as is
+            encrypted_matrix.append(character)
+
+    cipher_output = "".join(encrypted_matrix)  # Join list of characters to form a string
     print(f" Your New Ciphertext: {cipher_output} \n Your ShiftKey: {shift_key} \nRemember to not lose your shift key for decryption!\n")
-    counter += 1 # Add 1 to counter
-    user_option_menu(counter) # Restart Menu and pass updated counter back
+    return cipher_output
 
-def caesar_decrypt(user_input: str, shift_key: int, counter: int) -> str:
-    alphabet_matrix = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"] # Same as above
+
+def caesar_decrypt(user_input: str, shift_key: int) -> str:
+    """
+    Decrypt the input text using the Caesar cipher algorithm.
+    
+    Args:
+        user_input: The encrypted text to decrypt
+        shift_key: The number of positions each letter was shifted during encryption
+        
+    Returns:
+        The decrypted text
+    """
     decrypted_matrix = []
-    for characters in user_input:
-        if characters in alphabet_matrix: 
-            alphabet_index = alphabet_matrix.index(characters)
-            alphabet_index = alphabet_index - shift_key  # Reversed operation, Shifting backwards rather than forwards since we are decrypting
-            while alphabet_index < 0:  # Keep adjusting until within in range of [0] - [25]
-                alphabet_index += 26 # Keep adding 26 until within range
-            alphabet_cipher = alphabet_matrix[alphabet_index] # Same as above, True shift value is mapped to corresponding index of a character inside alphabet_matrix
+    
+    for character in user_input:
+        if character in ALPHABET_MATRIX:
+            alphabet_index = ALPHABET_MATRIX.index(character)
+            # Simplified algorithm using modulo
+            new_index = (alphabet_index - shift_key) % 26
+            alphabet_cipher = ALPHABET_MATRIX[new_index]
             decrypted_matrix.append(alphabet_cipher)
         else:
-            decrypted_matrix.append(characters)
+            decrypted_matrix.append(character)
 
-    decrypted_cipher_output = "".join(decrypted_matrix) # Join list of characters inside encrypted_matrix to form a string
+    decrypted_cipher_output = "".join(decrypted_matrix)
     print(f" Your Decrypted Ciphertext: {decrypted_cipher_output}\n Based on given Ciphertext: ({user_input}) & Shift Key: ({shift_key})\n")
-    counter += 1
-    user_option_menu(counter)
+    return decrypted_cipher_output
 
-def user_option_menu(counter: int) -> None:
-    if counter == 0: # When 0, which it is at the start, after user progression with program, this Initial Welcome Message will no longer appear since counter will be > 0
-        print("Hello & Welcome to my Caesar Cipher Suite Personal Project!")
-    user_option_input = input("-[Suite Menu]-\n Please Enter [1] for Encryption: \n Please Enter [2] for Decryption:\n To Exit, Please Type either of the following: [stop, quit, exit, q] \n Your Choice: ")
-    if user_option_input in ["1"]: # Encrypt Option, check user_option_input for exactly the string '1' + auto sanitisation
-        user_string_input = input("-[Encryption Menu]-\n Please Enter A Sentence or Word You Would Like To Encrypt: ").upper()
-        while True: # Begin Loop until broken
-            try: # handle NaN inputs if necessary
-                shiftkey_input = int(input(" Please Enter A Number For Creating Your Unique Ciphertext: ")) # Convert input to integer
-                if shiftkey_input < 0:
-                    raise ValueError(" [Error]: Input can not be Negative\n")
-                break # Exit loop if input is a number
-            except ValueError as Errors: # If NaN | If negative
-                err = str(Errors) # Convert ValueError to string 
-                if "[Error]: Input can not be Negative" in err: # Check for my own message in string err to satisfy condition
-                    print(Errors) # Print the original Negative number error message as passed onto ValueError
-                else:
-                    print(" [Error]: Input is not a Number\n") # NaN error message
-        caeser_encrypt(user_string_input, shiftkey_input, counter) # Pass parameters into caesar_encrypt()
-    elif user_option_input in ["2"]: # Decrypt Option, Same as above
-        user_string_input = input("-[Decryption Menu]-\n Please Enter The Ciphertext You Would Like To Decrypt: " ).upper()
-        while True:
-            try:
-                shiftkey_input = int(input(" Please Enter A Number For Creating Your Unique Ciphertext: ")) # Convert input to integer
-                if shiftkey_input < 0:
-                    raise ValueError(" [Error]: Input can not be Negative\n")
-                break
-            except ValueError as Errors:
-                err = str(Errors)
-                if "[Error]: Input can not be Negative" in err:
-                    print(Errors)
-                else:
-                    print(" [Error]: Input is not a Number\n")
-        caesar_decrypt(user_string_input, shiftkey_input, counter) # Pass parameters into caesar_decrypt()
-    elif user_option_input.lower() in ["quit","stop","exit","q"]: # if any text entered with matching strings, after .lower conversion, then do following
-        print("Exiting Caesar Cipher Suite")
-        StopIteration # Stop Program
-    else: # If none of the above
-        print("Please Enter A Valid Option!\n")
-        user_option_menu(counter) # Easy Loop call function
 
-user_option_menu(counter = 0) # Open the menu for the user with counter set to 0
+def get_shift_key() -> int:
+    """
+    Get a valid shift key from the user.
+    
+    Returns:
+        A positive integer to use as the shift key
+    """
+    while True:
+        try:
+            shift_key = int(input(SHIFT_KEY_PROMPT))
+            if shift_key < 0:
+                raise ValueError(ERROR_NEGATIVE)
+            return shift_key
+        except ValueError as error:
+            err = str(error)
+            if ERROR_NEGATIVE in err:
+                print(error)
+            else:
+                print(ERROR_NOT_NUMBER)
+
+
+def main() -> None:
+    """
+    Main function to run the Caesar Cipher Suite.
+    Handles the menu system and user interaction.
+    """
+    show_welcome = True
+    
+    while True:
+        # Show welcome message only on first run
+        if show_welcome:
+            print(WELCOME_MESSAGE)
+            show_welcome = False
+            
+        user_option_input = input(MENU_PROMPT)
+        
+        if user_option_input == "1":  # Encrypt Option
+            user_string_input = input(ENCRYPTION_PROMPT).upper()
+            shift_key = get_shift_key()
+            caesar_encrypt(user_string_input, shift_key)
+            
+        elif user_option_input == "2":  # Decrypt Option
+            user_string_input = input(DECRYPTION_PROMPT).upper()
+            shift_key = get_shift_key()
+            caesar_decrypt(user_string_input, shift_key)
+            
+        elif user_option_input.lower() in ["quit", "stop", "exit", "q"]:
+            print(EXIT_MESSAGE)
+            sys.exit()
+            
+        else:
+            print(ERROR_INVALID_OPTION)
+
+
+if __name__ == "__main__":
+    main()
