@@ -26,7 +26,7 @@ It is designed to be easy to use and offers flexibility through custom shift key
 
 1. 
     ```bash
-   git clone https://github.com/sombreserotonin/Caesar-Cipher-Suite
+   git clone https://github.com/Quantum-git/Caesar-Cipher-Suite.git
 2.
     ```bash
     cd Caesar-Cipher-Suite
